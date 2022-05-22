@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion } = require('mongodb');
+require('dotenv').config();
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -13,7 +15,15 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run(){
     try{
-        
+        await client.connect();
+        const fruitsCollection = client.db('warehouse').collection('fruit');
+
+        app.get('/fruit', async(req, res) => {
+            const query = {};
+            const cursor = fruitsCollection.find(query);
+            const fruits = await cursor.toArray();
+            res.send(fruits);
+        })
     }
     finally{}
 }
